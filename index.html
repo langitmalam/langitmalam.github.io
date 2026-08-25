@@ -109,42 +109,45 @@
     ========================= */
 
     section {
-        max-width: 900px;
-        margin: auto;
-        padding: 85px 20px;
-        text-align: center;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 85px 20px;
+    text-align: center;
 
-        background-image:
-            linear-gradient(
-                rgba(243, 240, 234, 0.72),
-                rgba(243, 240, 234, 0.72)
-            ),
-            url("langitmalam-paper.png");
+    background-image:
+        linear-gradient(
+            rgba(243, 240, 234, 0.72),
+            rgba(243, 240, 234, 0.72)
+        ),
+        url("langitmalam-paper.png");
 
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-    }
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
 
-    section > h2 {
-        font-size: 28px;
-        font-weight: normal;
-        letter-spacing: 4px;
-        margin-bottom: 45px;
-    }
+section > h2 {
+    font-size: 28px;
+    font-weight: normal;
+    letter-spacing: 4px;
+    margin-bottom: 45px;
+}
 
+/* =========================
+   SECTION SYMBOL
+========================= */
 
-    /* =========================
-       SECTION SYMBOL
-    ========================= */
+section::before {
+    content: "— ✦ —";
+    display: block;
+    margin-bottom: 25px;
 
-    .section-symbol {
-        margin-bottom: 25px;
-        font-family: Georgia, "Times New Roman", serif;
-        font-size: 15px;
-        letter-spacing: 5px;
-        color: #77736c;
-    }
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 15px;
+    letter-spacing: 5px;
+    color: #77736c;
+}
 
 
     /* =========================
