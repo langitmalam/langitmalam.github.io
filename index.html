@@ -7,6 +7,67 @@
 <title>LANGITMALAM</title>
 
 <style>
+
+    .language-selector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 25px 0 35px;
+}
+
+.language-button {
+    padding: 10px 22px;
+    border: 1px solid #ccc;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.language-button.active {
+    font-weight: bold;
+}
+
+.language-books {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.language-books .book {
+    display: none;
+}
+
+.language-books .book.active {
+    display: block;
+}
+
+.carousel-arrow {
+    position: absolute;
+    top: 45%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.carousel-arrow.left {
+    left: -45px;
+}
+
+.carousel-arrow.right {
+    right: -45px;
+}
+
+.book-counter {
+    margin-top: 20px;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+    
 body {
     margin: 0;
     font-family: Georgia, serif;
@@ -43,15 +104,7 @@ nav a {
     text-decoration: none;
     margin: 0 20px;
 }
-
-.language-title {
-    margin-top: 60px;
-    margin-bottom: 30px;
-    text-align: center;
-    font-size: 18px;
-    letter-spacing: 3px;
- } 
-    
+ 
     section {
     max-width: 900px;
     margin: auto;
@@ -122,6 +175,52 @@ footer {
 </style>
 </head>
 
+    <script>
+let currentBook = {
+    english: 0,
+    malay: 0
+};
+
+function showLanguage(language) {
+
+    document.querySelectorAll('.language-books').forEach(section => {
+        section.style.display = 'none';
+    });
+
+    document.getElementById(language).style.display = 'block';
+
+    document.querySelectorAll('.language-button').forEach(button => {
+        button.classList.remove('active');
+    });
+
+    event.target.classList.add('active');
+}
+
+function changeBook(language, direction) {
+
+    const books = document.querySelectorAll(
+        '#' + language + ' .book'
+    );
+
+    books[currentBook[language]].classList.remove('active');
+
+    currentBook[language] += direction;
+
+    if (currentBook[language] < 0) {
+        currentBook[language] = books.length - 1;
+    }
+
+    if (currentBook[language] >= books.length) {
+        currentBook[language] = 0;
+    }
+
+    books[currentBook[language]].classList.add('active');
+
+    document.getElementById(language + '-counter').textContent =
+        (currentBook[language] + 1) + ' / ' + books.length;
+}
+</script>
+    
 <body>
 
 <header>
@@ -146,156 +245,200 @@ footer {
 
 <section id="library">
 
-    <h2 class="language-title">ENGLISH</h2>
+    <h2>THE LIBRARY</h2>
 
-    <div class="book">
+    <div class="language-selector">
+        <button class="language-button active" onclick="showLanguage('english')">
+            ENGLISH
+        </button>
 
-        <img src="cover.png" alt="Letters I Never Sent">
+        <button class="language-button" onclick="showLanguage('malay')">
+            BAHASA MELAYU
+        </button>
+    </div>
 
-        <h2>LETTER I NEVER SENT</h2>
 
-        <div class="author">
-            Sky하늘
+    <!-- ENGLISH BOOKS -->
+
+    <div id="english" class="language-books">
+
+        <button class="carousel-arrow left" onclick="changeBook('english', -1)">
+            &#10094;
+        </button>
+
+        <div class="book english-book active">
+
+            <img src="cover.png" alt="Letters I Never Sent">
+
+            <h2>LETTER I NEVER SENT</h2>
+
+            <div class="author">
+                Sky하늘
+            </div>
+
+            <div class="genre">
+                Psychological Fiction · Drama · Romance
+            </div>
+
+            <p class="description">
+                Some letters are never meant to be delivered.
+                Some words are too heavy to say,
+                so they remain here.
+            </p>
+
+            <a class="button"
+               href="letters-i-never-sent.pdf"
+               target="_blank">
+                READ ONLINE
+            </a>
+
+            <a class="button"
+               href="letters-i-never-sent.pdf"
+               download>
+                DOWNLOAD PDF
+            </a>
+
         </div>
 
-        <div class="genre">
-            Psychological Fiction · Drama · Romance
+
+        <div class="book english-book">
+
+            <img src="the-ghost-they-called-me-cover.png"
+                 alt="The Ghost They Called Me">
+
+            <h2>THE GHOST THEY CALLED ME</h2>
+
+            <div class="author">
+                Sky하늘
+            </div>
+
+            <div class="genre">
+                Psychological Horror · Mystery · Drama
+            </div>
+
+            <p class="description">
+                Some stories are not about ghosts.
+                Sometimes, they are about the people
+                who were never heard while they were alive.
+            </p>
+
+            <a class="button"
+               href="the-ghost-they-called-me.pdf"
+               target="_blank">
+                READ ONLINE
+            </a>
+
+            <a class="button"
+               href="the-ghost-they-called-me.pdf"
+               download>
+                DOWNLOAD PDF
+            </a>
+
         </div>
 
-        <p class="description">
-            Some letters are never meant to be delivered.
-            Some words are too heavy to say,
-            so they remain here.
-        </p>
+        <button class="carousel-arrow right" onclick="changeBook('english', 1)">
+            &#10095;
+        </button>
 
-        <a class="button"
-           href="letters-i-never-sent.pdf"
-           target="_blank">
-            READ ONLINE
-        </a>
-
-        <a class="button"
-           href="letters-i-never-sent.pdf"
-           download>
-            DOWNLOAD PDF
-        </a>
+        <div class="book-counter" id="english-counter">
+            1 / 2
+        </div>
 
     </div>
 
 
-    <div class="book">
+    <!-- MALAY BOOKS -->
 
-        <img src="the-ghost-they-called-me-cover.png"
-             alt="The Ghost They Called Me">
+    <div id="malay" class="language-books" style="display: none;">
 
-        <h2>THE GHOST THEY CALLED ME</h2>
+        <button class="carousel-arrow left" onclick="changeBook('malay', -1)">
+            &#10094;
+        </button>
 
-        <div class="author">
-            Sky하늘
+        <div class="book malay-book active">
+
+            <img src="yang-pernah-kita-panggil-cinta-cover.png"
+                 alt="Yang Pernah Kita Panggil Cinta">
+
+            <h2>YANG PERNAH KITA PANGGIL CINTA</h2>
+
+            <div class="author">
+                LangitMalam
+            </div>
+
+            <div class="genre">
+                Romance · Drama · Contemporary Fiction
+            </div>
+
+            <p class="description">
+                Ada cinta yang pernah kita genggam,
+                tetapi akhirnya hanya tinggal sebagai kenangan.
+                Dan ada nama yang masih kita ingat,
+                walaupun kisahnya sudah lama berakhir.
+            </p>
+
+            <a class="button"
+               href="yang-pernah-kita-panggil-cinta.pdf"
+               target="_blank">
+                READ ONLINE
+            </a>
+
+            <a class="button"
+               href="yang-pernah-kita-panggil-cinta.pdf"
+               download>
+                DOWNLOAD PDF
+            </a>
+
         </div>
 
-        <div class="genre">
-            Psychological Horror · Mystery · Drama
+
+        <div class="book malay-book">
+
+            <img src="bukan-orang-asing-cover.png"
+                 alt="Bukan Orang Asing">
+
+            <h2>BUKAN ORANG ASING</h2>
+
+            <div class="author">
+                LangitMalam
+            </div>
+
+            <div class="genre">
+                Drama · Psychological Fiction · Mystery
+            </div>
+
+            <p class="description">
+                Kadang-kadang, orang yang paling kita kenal
+                adalah orang yang paling banyak menyimpan rahsia.
+                Dan mungkin, selama ini, dia bukan orang asing.
+            </p>
+
+            <a class="button"
+               href="bukan-orang-asing.pdf"
+               target="_blank">
+                READ ONLINE
+            </a>
+
+            <a class="button"
+               href="bukan-orang-asing.pdf"
+               download>
+                DOWNLOAD PDF
+            </a>
+
         </div>
 
-        <p class="description">
-            Some stories are not about ghosts.
-            Sometimes, they are about the people
-            who were never heard while they were alive.
-        </p>
+        <button class="carousel-arrow right" onclick="changeBook('malay', 1)">
+            &#10095;
+        </button>
 
-        <a class="button"
-           href="the-ghost-they-called-me.pdf"
-           target="_blank">
-            READ ONLINE
-        </a>
-
-        <a class="button"
-           href="the-ghost-they-called-me.pdf"
-           download>
-            DOWNLOAD PDF
-        </a>
+        <div class="book-counter" id="malay-counter">
+            1 / 2
+        </div>
 
     </div>
 
-
-    <h2 class="language-title">BAHASA MELAYU</h2>
-
-
-    <div class="book">
-
-        <img src="yang-pernah-kita-panggil-cinta-cover.png"
-             alt="Yang Pernah Kita Panggil Cinta">
-
-        <h2>YANG PERNAH KITA PANGGIL CINTA</h2>
-
-        <div class="author">
-            LangitMalam
-        </div>
-
-        <div class="genre">
-            Romance · Drama · Contemporary Fiction
-        </div>
-
-        <p class="description">
-            Ada cinta yang pernah kita genggam,
-            tetapi akhirnya hanya tinggal sebagai kenangan.
-            Dan ada nama yang masih kita ingat,
-            walaupun kisahnya sudah lama berakhir.
-        </p>
-
-        <a class="button"
-           href="yang-pernah-kita-panggil-cinta.pdf"
-           target="_blank">
-            READ ONLINE
-        </a>
-
-        <a class="button"
-           href="yang-pernah-kita-panggil-cinta.pdf"
-           download>
-            DOWNLOAD PDF
-        </a>
-
-    </div>
-
-
-    <div class="book">
-
-        <img src="bukan-orang-asing-cover.png"
-             alt="Bukan Orang Asing">
-
-        <h2>BUKAN ORANG ASING</h2>
-
-        <div class="author">
-            LangitMalam
-        </div>
-
-        <div class="genre">
-            Drama · Psychological Fiction · Mystery
-        </div>
-
-        <p class="description">
-            Kadang-kadang, orang yang paling kita kenal
-            adalah orang yang paling banyak menyimpan rahsia.
-            Dan mungkin, selama ini, dia bukan orang asing.
-        </p>
-
-        <a class="button"
-           href="bukan-orang-asing.pdf"
-           target="_blank">
-            READ ONLINE
-        </a>
-
-        <a class="button"
-           href="bukan-orang-asing.pdf"
-           download>
-            DOWNLOAD PDF
-        </a>
-
-    </div>
-    
 </section>
-
+    
     <section id="feedback">
 
     <h2>LEAVE SOMETHING BEHIND</h2>
