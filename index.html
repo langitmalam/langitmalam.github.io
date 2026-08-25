@@ -8,176 +8,417 @@
 
 <style>
 
-    * {
-        box-sizing: border-box;
-    }
+/* =========================
+   RESET
+========================= */
 
-    html {
-        scroll-behavior: smooth;
-    }
+* {
+    box-sizing: border-box;
+}
 
-    body {
-        margin: 0;
-        font-family: Georgia, "Times New Roman", serif;
-        background: #f3f0ea;
-        color: #25282a;
-        line-height: 1.6;
-    }
+html {
+    scroll-behavior: smooth;
+}
 
-    /* =========================
-       HEADER
-    ========================= */
+body {
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    background: #f3f0ea;
+    color: #25282a;
+    line-height: 1.6;
+}
 
-    header {
-        background-image:
-            linear-gradient(
-                rgba(20, 29, 35, 0.58),
-                rgba(20, 29, 35, 0.72)
-            ),
-            url("langitmalam-bg.png");
 
-        background-size: cover;
-        background-position: center top;
-        background-repeat: no-repeat;
+/* =========================
+   HEADER
+========================= */
 
-        color: #f5f3ef;
-        text-align: center;
-        padding: 105px 20px 90px;
-        position: relative;
-        overflow: hidden;
-    }
+header {
+    background-image:
+        linear-gradient(
+            rgba(20, 29, 35, 0.58),
+            rgba(20, 29, 35, 0.72)
+        ),
+        url("langitmalam-bg.png");
 
-    header::after {
-        content: "";
-        position: absolute;
-        width: 220px;
-        height: 220px;
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 50%;
-        top: -110px;
-        right: -70px;
-    }
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
 
-    header h1 {
-        font-size: clamp(38px, 7vw, 64px);
-        font-weight: normal;
-        letter-spacing: 10px;
-        margin: 0 0 18px;
-    }
+    color: #f5f3ef;
+    text-align: center;
 
-    header p {
-        font-size: 17px;
-        font-style: italic;
-        color: #c9c8c2;
-        margin: 0;
-        letter-spacing: 0.5px;
-    }
+    padding: 105px 20px 90px;
 
-   /* =========================
-   FEATURED LIBRARY
+    position: relative;
+    overflow: hidden;
+}
+
+header::after {
+    content: "";
+
+    position: absolute;
+
+    width: 220px;
+    height: 220px;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    border-radius: 50%;
+
+    top: -110px;
+    right: -70px;
+}
+
+header h1 {
+    font-size: clamp(38px, 7vw, 64px);
+
+    font-weight: normal;
+
+    letter-spacing: 10px;
+
+    margin: 0 0 18px;
+}
+
+header p {
+    font-size: 17px;
+
+    font-style: italic;
+
+    color: #c9c8c2;
+
+    margin: 0;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+nav {
+    background: #1b252b;
+
+    text-align: center;
+
+    padding: 18px 15px;
+
+    position: sticky;
+    top: 0;
+
+    z-index: 20;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.06);
+}
+
+nav a {
+    color: #dddcd7;
+
+    text-decoration: none;
+
+    margin: 0 18px;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+
+    transition: color 0.3s ease;
+}
+
+nav a:hover {
+    color: white;
+}
+
+
+/* =========================
+   SECTIONS
+========================= */
+
+section {
+    width: 100%;
+
+    max-width: none;
+
+    margin: 0;
+
+    padding: 80px 20px;
+
+    text-align: center;
+
+    background-image:
+        linear-gradient(
+            rgba(243, 240, 234, 0.70),
+            rgba(243, 240, 234, 0.70)
+        ),
+        url("langitmalam-paper.png");
+
+    background-size: cover;
+
+    background-position: center;
+
+    background-repeat: no-repeat;
+}
+
+
+/* =========================
+   SECTION SYMBOL
+========================= */
+
+.section-symbol {
+    margin-bottom: 22px;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 15px;
+
+    letter-spacing: 5px;
+
+    color: #77736c;
+}
+
+.bottom-symbol {
+    margin-top: 45px;
+}
+
+
+/* IMPORTANT:
+   There is NO section::before here.
+   This prevents the duplicate symbol.
+*/
+
+
+/* =========================
+   SECTION TITLE
+========================= */
+
+section > h2 {
+    font-size: 28px;
+
+    font-weight: normal;
+
+    letter-spacing: 4px;
+
+    margin: 0 0 38px;
+}
+
+
+/* =========================
+   LANGUAGE SELECTOR
+========================= */
+
+.language-selector {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    margin: 0 auto 45px;
+}
+
+.language-button {
+    padding: 11px 24px;
+
+    border: 1px solid #b8b5ae;
+
+    background: transparent;
+
+    color: #303538;
+
+    cursor: pointer;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+
+    letter-spacing: 2px;
+
+    transition:
+        background 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.language-button:hover,
+.language-button.active {
+    background: #26333a;
+
+    color: #f5f3ef;
+
+    border-color: #26333a;
+}
+
+
+/* =========================
+   LIBRARY CAROUSEL
 ========================= */
 
 .library-carousel {
     position: relative;
+
     max-width: 900px;
+
     margin: 0 auto;
+
     padding: 0 55px 30px;
 }
+
+
+/* =========================
+   BOOK DISPLAY
+========================= */
 
 .library-book {
     display: none;
 
     max-width: 760px;
-    min-height: 300px;
+
+    min-height: 330px;
+
     margin: 0 auto;
 
-    padding: 28px;
+    padding: 30px;
 
     background:
         linear-gradient(
-            rgba(250, 249, 246, 0.88),
-            rgba(250, 249, 246, 0.88)
+            rgba(250,249,246,0.92),
+            rgba(250,249,246,0.92)
         ),
         url("langitmalam-paper.png");
 
     background-size: cover;
+
     background-position: center;
 
     border: 1px solid #dedad2;
 
     box-shadow:
-        0 12px 35px rgba(30, 35, 38, 0.10);
+        0 15px 40px rgba(30,35,38,0.12);
 
-    grid-template-columns: 230px 1fr;
-    gap: 35px;
+    grid-template-columns:
+        230px 1fr;
+
+    gap: 38px;
+
     align-items: center;
 
     text-align: left;
 
-    animation: libraryFade 0.4s ease;
+    animation:
+        libraryFade 0.45s ease;
 }
 
 .library-book.active {
     display: grid;
 }
 
+
 @keyframes libraryFade {
 
     from {
         opacity: 0;
-        transform: translateY(8px);
+
+        transform:
+            translateY(10px);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
+
+        transform:
+            translateY(0);
     }
 
 }
 
 
-/* BOOK COVER */
+/* =========================
+   3D BOOK COVER
+========================= */
 
 .library-book img {
     width: 210px;
+
     max-width: 100%;
+
     display: block;
+
     margin: 0 auto;
 
+    border-radius: 1px;
+
+    transform:
+        perspective(900px)
+        rotateY(-7deg)
+        rotateX(1deg);
+
+    transform-origin: left center;
+
     box-shadow:
-        0 12px 28px rgba(0,0,0,0.20);
+        8px 10px 0 rgba(30,35,38,0.08),
+        14px 18px 30px rgba(0,0,0,0.22);
 
     transition:
-        transform 0.3s ease;
+        transform 0.45s ease,
+        box-shadow 0.45s ease;
 }
 
 .library-book img:hover {
-    transform: translateY(-4px);
+
+    transform:
+        perspective(900px)
+        rotateY(-12deg)
+        rotateX(2deg)
+        translateY(-5px);
+
+    box-shadow:
+        10px 12px 0 rgba(30,35,38,0.09),
+        18px 25px 38px rgba(0,0,0,0.25);
 }
 
 
-/* BOOK INFORMATION */
+/* =========================
+   BOOK INFORMATION
+========================= */
 
 .library-info h3 {
     margin: 0 0 5px;
 
     font-size: 27px;
+
     font-weight: normal;
+
     letter-spacing: 1px;
+
     line-height: 1.3;
 }
 
 .library-author {
     font-size: 16px;
+
     font-style: italic;
+
     color: #555b5e;
+
     margin-bottom: 12px;
 }
 
 .library-genre {
     font-family: Arial, sans-serif;
+
     font-size: 9px;
+
     letter-spacing: 1.5px;
+
     color: #777;
 
     margin-bottom: 20px;
@@ -185,26 +426,77 @@
 
 .library-info p {
     font-size: 14px;
+
     line-height: 1.7;
+
     color: #555;
 
     margin: 0 0 20px;
 }
 
 
-/* ARROWS */
+/* =========================
+   BUTTONS
+========================= */
+
+.button {
+    display: inline-block;
+
+    background: #26333a;
+
+    color: #f5f3ef;
+
+    padding: 13px 25px;
+
+    margin: 7px 4px;
+
+    text-decoration: none;
+
+    border:
+        1px solid #26333a;
+
+    border-radius: 2px;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 10px;
+
+    letter-spacing: 1.5px;
+
+    transition:
+        background 0.3s ease,
+        color 0.3s ease,
+        transform 0.3s ease;
+}
+
+.button:hover {
+    background: transparent;
+
+    color: #26333a;
+
+    transform:
+        translateY(-2px);
+}
+
+
+/* =========================
+   LIBRARY ARROWS
+========================= */
 
 .library-arrow {
     position: absolute;
 
     top: 45%;
 
-    transform: translateY(-50%);
+    transform:
+        translateY(-50%);
 
     border: none;
+
     background: transparent;
 
     font-family: Georgia, serif;
+
     font-size: 45px;
 
     color: #555;
@@ -213,6 +505,8 @@
 
     z-index: 5;
 
+    padding: 10px;
+
     transition:
         color 0.3s ease,
         transform 0.3s ease;
@@ -220,18 +514,24 @@
 
 .library-arrow:hover {
     color: #1b252b;
+
+    transform:
+        translateY(-50%)
+        scale(1.15);
 }
 
 .library-arrow.left {
-    left: 5px;
+    left: 0;
 }
 
 .library-arrow.right {
-    right: 5px;
+    right: 0;
 }
 
 
-/* COUNTER */
+/* =========================
+   BOOK COUNTER
+========================= */
 
 .library-counter {
     text-align: center;
@@ -239,34 +539,91 @@
     margin-top: 15px;
 
     font-family: Arial, sans-serif;
+
     font-size: 10px;
 
-    letter-spacing: 3px;
+    letter-spacing: 4px;
 
     color: #777;
 }
 
 
-/* BOTTOM SYMBOL */
+/* =========================
+   FEEDBACK
+========================= */
 
-.bottom-symbol {
-    margin-top: 45px;
+#feedback {
+    border-top:
+        1px solid #dedbd4;
 }
 
 
-/* MOBILE */
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+    background: #1b252b;
+
+    color: #c9c8c2;
+
+    text-align: center;
+
+    padding: 45px 20px;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+
+    letter-spacing: 1px;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 700px) {
 
+    header {
+        padding:
+            80px 20px 70px;
+    }
+
+    header h1 {
+        letter-spacing: 6px;
+    }
+
+    nav a {
+        margin: 0 8px;
+
+        font-size: 10px;
+
+        letter-spacing: 1px;
+    }
+
+    section {
+        padding:
+            65px 15px;
+    }
+
+    section > h2 {
+        font-size: 24px;
+    }
+
     .library-carousel {
-        padding: 0 25px 30px;
+        padding:
+            0 25px 30px;
     }
 
     .library-book {
         grid-template-columns: 1fr;
+
         text-align: center;
 
-        padding: 25px 20px;
+        padding:
+            25px 20px;
+
         gap: 20px;
     }
 
@@ -294,495 +651,207 @@
         right: -5px;
     }
 
-}
-
-    /* =========================
-       NAVIGATION
-    ========================= */
-
-    nav {
-        background: #1b252b;
-        text-align: center;
-        padding: 18px 15px;
-        position: sticky;
-        top: 0;
-        z-index: 20;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
-
-    nav a {
-        color: #dddcd7;
-        text-decoration: none;
-        margin: 0 18px;
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        transition: color 0.3s ease;
-    }
-
-    nav a:hover {
-        color: white;
-    }
-
-
-    /* =========================
-       SECTIONS
-    ========================= */
-
-    section {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    padding: 85px 20px;
-    text-align: center;
-
-    background-image:
-        linear-gradient(
-            rgba(243, 240, 234, 0.72),
-            rgba(243, 240, 234, 0.72)
-        ),
-        url("langitmalam-paper.png");
-
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-section > h2 {
-    font-size: 28px;
-    font-weight: normal;
-    letter-spacing: 4px;
-    margin-bottom: 45px;
-}
-
-/* =========================
-   SECTION SYMBOL
-========================= */
-
-section::before {
-    content: "— ✦ —";
-    display: block;
-    margin-bottom: 25px;
-
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 15px;
-    letter-spacing: 5px;
-    color: #77736c;
-}
-
-
-    /* =========================
-       LANGUAGE SELECTOR
-    ========================= */
-
     .language-selector {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        margin: 0 auto 45px;
+        gap: 7px;
     }
 
     .language-button {
-        padding: 11px 24px;
-        border: 1px solid #b8b5ae;
-        background: transparent;
-        color: #303538;
-        cursor: pointer;
-        font-family: Arial, sans-serif;
-        font-size: 11px;
-        letter-spacing: 2px;
-        transition:
-            background 0.3s ease,
-            color 0.3s ease,
-            border-color 0.3s ease;
+        padding:
+            10px 15px;
     }
-
-    .language-button:hover,
-    .language-button.active {
-        background: #26333a;
-        color: #f5f3ef;
-        border-color: #26333a;
-    }
-
-
-    /* =========================
-       BOOK CAROUSEL
-    ========================= */
-
-    .language-books {
-        position: relative;
-        max-width: 560px;
-        margin: 0 auto;
-        text-align: center;
-    }
-
-    .language-books .book {
-        display: none;
-    }
-
-    .language-books .book.active {
-        display: block;
-        animation: bookFade 0.45s ease;
-    }
-
-    @keyframes bookFade {
-        from {
-            opacity: 0;
-            transform: translateY(8px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-
-    /* =========================
-       BOOK CARD
-    ========================= */
-
-    .book {
-        background: #faf9f6;
-        padding: 45px 35px 40px;
-        border: 1px solid #e3e0d9;
-        box-shadow:
-            0 15px 45px rgba(30, 35, 38, 0.08);
-    }
-
-    .book img {
-        width: 320px;
-        max-width: 90%;
-        display: block;
-        margin: 0 auto 35px;
-        border-radius: 1px;
-        box-shadow:
-            0 15px 35px rgba(0,0,0,0.18);
-        transition:
-            transform 0.4s ease,
-            box-shadow 0.4s ease;
-    }
-
-    .book img:hover {
-        transform: translateY(-5px);
-        box-shadow:
-            0 20px 40px rgba(0,0,0,0.22);
-    }
-
-    .book h2 {
-        margin: 10px 0 8px;
-        font-size: 27px;
-        font-weight: normal;
-        letter-spacing: 1px;
-        line-height: 1.3;
-    }
-
-    .author {
-        font-style: italic;
-        font-size: 17px;
-        color: #555b5e;
-    }
-
-    .genre {
-        font-family: Arial, sans-serif;
-        font-size: 10px;
-        color: #777;
-        margin-top: 11px;
-        margin-bottom: 22px;
-        font-style: normal;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
-
-    .description {
-        max-width: 570px;
-        margin: 22px auto 28px;
-        line-height: 1.85;
-        font-size: 15px;
-        color: #555;
-    }
-
-
-    /* =========================
-       BUTTONS
-    ========================= */
 
     .button {
-        display: inline-block;
-        background: #26333a;
-        color: #f5f3ef;
-        padding: 13px 25px;
-        margin: 7px 4px;
-        text-decoration: none;
-        border: 1px solid #26333a;
-        border-radius: 2px;
-        font-family: Arial, sans-serif;
-        font-size: 10px;
-        letter-spacing: 1.5px;
-        transition:
-            background 0.3s ease,
-            color 0.3s ease,
-            transform 0.3s ease;
+        padding:
+            12px 18px;
+
+        margin:
+            5px 2px;
     }
 
-    .button:hover {
-        background: transparent;
-        color: #26333a;
-        transform: translateY(-2px);
-    }
-
-
-    /* =========================
-       CAROUSEL ARROWS
-    ========================= */
-
-    .carousel-arrow {
-        position: absolute;
-        top: 45%;
-        transform: translateY(-50%);
-        border: none;
-        background: transparent;
-        color: #6b6d6d;
-        font-size: 28px;
-        font-family: Georgia, serif;
-        cursor: pointer;
-        z-index: 5;
-        transition:
-            color 0.3s ease,
-            transform 0.3s ease;
-    }
-
-    .carousel-arrow:hover {
-        color: #26333a;
-    }
-
-    .carousel-arrow.left {
-        left: -55px;
-    }
-
-    .carousel-arrow.right {
-        right: -55px;
-    }
-
-    .book-counter {
-        margin-top: 22px;
-        font-family: Arial, sans-serif;
-        font-size: 10px;
-        color: #888;
-        letter-spacing: 3px;
-    }
-
-
-    /* =========================
-       FEEDBACK
-    ========================= */
-
-    #feedback {
-        border-top: 1px solid #dedbd4;
-    }
-
-
-    /* =========================
-       FOOTER
-    ========================= */
-
-    footer {
-        background: #1b252b;
-        color: #c9c8c2;
-        text-align: center;
-        padding: 45px 20px;
-        font-family: Arial, sans-serif;
-        font-size: 11px;
-        letter-spacing: 1px;
-    }
-
-
-    /* =========================
-       MOBILE
-    ========================= */
-
-    @media (max-width: 700px) {
-
-        header {
-            padding: 80px 20px 70px;
-        }
-
-        header h1 {
-            letter-spacing: 6px;
-        }
-
-        nav a {
-            margin: 0 8px;
-            font-size: 10px;
-            letter-spacing: 1px;
-        }
-
-        section {
-            padding: 65px 15px;
-        }
-
-        .book {
-            padding: 35px 20px;
-        }
-
-        .book h2 {
-            font-size: 23px;
-        }
-
-        .carousel-arrow.left {
-            left: -10px;
-        }
-
-        .carousel-arrow.right {
-            right: -10px;
-        }
-
-        .language-selector {
-            gap: 7px;
-        }
-
-        .language-button {
-            padding: 10px 15px;
-        }
-
-        .button {
-            padding: 12px 18px;
-            margin: 5px 2px;
-        }
-
-        .section-symbol {
-            margin-bottom: 20px;
-        }
-    }
+}
 
 </style>
     
 </head>
 
     <script>
-let currentBook = {
-    english: 0,
-    malay: 0
-};
+
+/* =========================
+   LANGITMALAM LIBRARY
+========================= */
+
+let currentEnglishBook = 0;
+let currentMalayBook = 0;
+
+
+/* =========================
+   LANGUAGE SWITCHER
+========================= */
 
 function showLanguage(language) {
 
-    document.querySelectorAll('.language-books').forEach(section => {
-        section.style.display = 'none';
-    });
+    const englishBooks =
+        document.getElementById("english-books");
 
-    document.getElementById(language).style.display = 'block';
+    const malayBooks =
+        document.getElementById("malay-books");
 
-    document.querySelectorAll('.language-button').forEach(button => {
-        button.classList.remove('active');
-    });
+    const buttons =
+        document.querySelectorAll(".language-button");
 
-    event.target.classList.add('active');
-}
 
-function changeBook(language, direction) {
-
-    const books = document.querySelectorAll(
-        '#' + language + ' .book'
-    );
-
-    books[currentBook[language]].classList.remove('active');
-
-    currentBook[language] += direction;
-
-    if (currentBook[language] < 0) {
-        currentBook[language] = books.length - 1;
+    if (!englishBooks || !malayBooks) {
+        return;
     }
 
-    if (currentBook[language] >= books.length) {
-        currentBook[language] = 0;
-    }
 
-    books[currentBook[language]].classList.add('active');
+    if (language === "english") {
 
-    document.getElementById(language + '-counter').textContent =
-        (currentBook[language] + 1) + ' / ' + books.length;
-}
-    
-<script>
+        englishBooks.style.display = "block";
 
-    const libraryState = {
-        english: 0,
-        malay: 0
-    };
+        malayBooks.style.display = "none";
 
 
-    function showLanguage(language) {
-
-        const englishBooks =
-            document.getElementById("english-books");
-
-        const malayBooks =
-            document.getElementById("malay-books");
-
-        const buttons =
-            document.querySelectorAll(".language-button");
-
-
-        if (language === "english") {
-
-            englishBooks.style.display = "block";
-            malayBooks.style.display = "none";
+        if (buttons.length >= 2) {
 
             buttons[0].classList.add("active");
+
             buttons[1].classList.remove("active");
 
-        } else {
+        }
 
-            englishBooks.style.display = "none";
-            malayBooks.style.display = "block";
+    }
+
+
+    if (language === "malay") {
+
+        englishBooks.style.display = "none";
+
+        malayBooks.style.display = "block";
+
+
+        if (buttons.length >= 2) {
 
             buttons[0].classList.remove("active");
+
             buttons[1].classList.add("active");
 
         }
 
     }
 
-
-    function changeBook(language, direction) {
-
-        const carousel =
-            document.getElementById(
-                language + "-books"
-            );
-
-        const books =
-            carousel.querySelectorAll(".library-book");
-
-        let current =
-            libraryState[language];
-
-        books[current].classList.remove("active");
+}
 
 
-        current += direction;
+/* =========================
+   BOOK CAROUSEL
+========================= */
+
+function changeBook(language, direction) {
+
+    let carousel;
+
+    let current;
 
 
-        if (current >= books.length) {
-            current = 0;
-        }
+    if (language === "english") {
 
-        if (current < 0) {
-            current = books.length - 1;
-        }
+        carousel =
+            document.getElementById("english-books");
 
+        current =
+            currentEnglishBook;
 
-        libraryState[language] = current;
-
-        books[current].classList.add("active");
+    }
 
 
-        const counter =
-            document.getElementById(
-                language + "-counter"
-            );
+    if (language === "malay") {
+
+        carousel =
+            document.getElementById("malay-books");
+
+        current =
+            currentMalayBook;
+
+    }
+
+
+    if (!carousel) {
+        return;
+    }
+
+
+    const books =
+        carousel.querySelectorAll(".library-book");
+
+
+    if (books.length === 0) {
+        return;
+    }
+
+
+    /* Hide current book */
+
+    books[current].classList.remove("active");
+
+
+    /* Move to next / previous */
+
+    current =
+        current + direction;
+
+
+    /* Loop forward */
+
+    if (current >= books.length) {
+
+        current = 0;
+
+    }
+
+
+    /* Loop backward */
+
+    if (current < 0) {
+
+        current =
+            books.length - 1;
+
+    }
+
+
+    /* Save current position */
+
+    if (language === "english") {
+
+        currentEnglishBook =
+            current;
+
+    }
+
+
+    if (language === "malay") {
+
+        currentMalayBook =
+            current;
+
+    }
+
+
+    /* Show new book */
+
+    books[current].classList.add("active");
+
+
+    /* Update counter */
+
+    const counter =
+        document.getElementById(
+            language + "-counter"
+        );
+
+
+    if (counter) {
 
         counter.textContent =
             String(current + 1).padStart(2, "0")
@@ -790,6 +859,22 @@ function changeBook(language, direction) {
             + String(books.length).padStart(2, "0");
 
     }
+
+}
+
+
+/* =========================
+   START LIBRARY
+========================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        showLanguage("english");
+
+    }
+);
 
 </script>
    
