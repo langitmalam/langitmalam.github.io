@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reader | LANGITMALAM</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #0b0b0b;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+    }
+    .nav-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(11, 11, 11, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 100;
+    }
+    .nav-bar a {
+      color: #999;
+      text-decoration: none;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-bar a:hover { color: #fff; }
+    #status {
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      opacity: 0.7;
+    }
+    .book-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 50px;
+      margin-bottom: 50px;
+    }
+    .page {
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      display: flex;
+      gap: 16px;
+      z-index: 100;
+    }
+    .btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #e0e0e0;
+      padding: 8px 18px;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: rgba(255, 255, 255, 0.2); }
+  </style>
+</head>
+<body>
+
+  <div class="nav-bar">
+    <a href="index.html">← Library</a>
+    <span id="status">Loading pages...</span>
+  </div>
+
+  <div class="book-container">
+    <div id="flipbook"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev-btn">Prev</button>
+    <button class="btn" id="next-btn">Next</button>
+  </div>
+
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    // Grabs ?file=your-pdf.pdf from URL, defaults to letters-i-never-sent.pdf
+    const urlParams = new URLSearchParams(window.location.search);
+    const pdfUrl = urlParams.get('file') || 'letters-i-never-sent.pdf';
+
+    const statusText = document.getElementById('status');
+    const container = document.getElementById('flipbook');
+
+    pdfjsLib.getDocument(pdfUrl).promise.then(async (pdf) => {
+      statusText.innerText = `Preparing ${pdf.numPages} pages...`;
+
+      // Render each PDF page onto an HTML canvas
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 1.5 });
+
+        const pageDiv = document.createElement('div');
+        pageDiv.className = 'page';
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+        pageDiv.appendChild(canvas);
+        container.appendChild(pageDiv);
+      }
+
+      statusText.innerText = '';
+
+      // Initialize the physical book flip effect
+      const pageFlip = new St.PageFlip(container, {
+        width: 400,
+        height: 600,
+        size: 'stretch',
+        minWidth: 300,
+        maxWidth: 550,
+        minHeight: 450,
+        maxHeight: 800,
+        showCover: true,
+        drawShadow: true,
+        mobileScrollSupport: false
+      });
+
+      pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+      document.getElementById('prev-btn').onclick = () => pageFlip.flipPrev();
+      document.getElementById('next-btn').onclick = () => pageFlip.flipNext();
+
+      pageFlip.on('flip', (e) => {
+        statusText.innerText = `Page ${e.data + 1} of ${pdf.numPages}`;
+      });
+    }).catch(err => {
+      statusText.innerText = 'Error loading book.';
+      console.error(err);
+    });
+  </script>
+</body>
+</html>
