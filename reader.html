@@ -17,7 +17,7 @@
       overflow: hidden;
     }
 
-    /* Fixed Top Navigation */
+    /* Fixed Navigation */
     .nav-bar {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -50,7 +50,7 @@
     .nav-btn:active { background: rgba(255, 255, 255, 0.25); }
     #status { font-size: 0.75rem; opacity: 0.7; }
 
-    /* Scrollable Container (Fixed Viewport) */
+    /* Scrollable Container */
     .viewport {
       position: fixed;
       top: 50px;
@@ -74,7 +74,7 @@
       transition: width 0.15s ease-out;
     }
 
-    /* Scroll Mode: Pages stack vertically with natural scrolling */
+    /* Scroll Mode: Vertical Stack */
     #scroll-view {
       display: flex;
       flex-direction: column;
@@ -90,12 +90,24 @@
       background-color: #fff;
     }
 
-    /* Book Flip Mode */
-    #flipbook { display: none; }
+    /* Flipbook Container */
+    #flipbook {
+      display: block;
+    }
     .page { background-color: #fff; }
     .page canvas { width: 100% !important; height: 100% !important; display: block; }
 
-    /* Bottom Navigation Bar */
+    /* Keeps flipbook in DOM with real dimensions instead of collapsing to 0x0 */
+    .view-hidden {
+      position: absolute !important;
+      left: -9999px !important;
+      top: -9999px !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+    }
+
+    /* Bottom Controls */
     .controls {
       position: fixed;
       bottom: 10px;
@@ -136,7 +148,7 @@
   <div class="viewport" id="scroll-container">
     <div class="content-wrapper" id="content-area">
       <div id="scroll-view"></div>
-      <div id="flipbook"></div>
+      <div id="flipbook" class="view-hidden"></div>
     </div>
   </div>
 
@@ -159,8 +171,8 @@
     const modeBtn = document.getElementById('mode-btn');
     const flipControls = document.getElementById('flip-controls');
 
+    let pdfDoc = null;
     let currentZoom = 1.0;
-    // Default mobile phones to scroll mode automatically
     let isScrollMode = window.innerWidth <= 768;
     let pageFlip = null;
 
@@ -169,7 +181,6 @@
       zoomVal.innerText = `${Math.round(currentZoom * 100)}%`;
 
       if (isScrollMode) {
-        // Expand real DOM dimensions so native vertical scrolling works effortlessly
         const baseWidth = Math.min(window.innerWidth * 0.94, 650);
         scrollContainer.style.maxWidth = `${baseWidth * currentZoom}px`;
       } else {
@@ -181,21 +192,83 @@
     document.getElementById('zoom-in').onclick = () => applyZoom(currentZoom + 0.2);
     document.getElementById('zoom-out').onclick = () => applyZoom(currentZoom - 0.2);
 
+    function initOrUpdateFlipBook() {
+      if (!pageFlip) {
+        // Build the flipbook for the first time while container has active dimensions
+        const bookWidth = Math.min(window.innerWidth * 0.92, 440);
+        const bookHeight = bookWidth * 1.45;
+
+        pageFlip = new St.PageFlip(flipContainer, {
+          width: bookWidth,
+          height: bookHeight,
+          size: 'stretch',
+          minWidth: 260,
+          maxWidth: 500,
+          minHeight: 380,
+          maxHeight: 750,
+          showCover: true,
+          drawShadow: true,
+          mobileScrollSupport: true
+        });
+
+        pageFlip.loadFromHTML(document.querySelectorAll('.page'));
+
+        document.getElementById('prev-btn').onclick = () => pageFlip.flipPrev();
+        document.getElementById('next-btn').onclick = () => pageFlip.flipNext();
+
+        pageFlip.on('flip', (e) => {
+          if (!isScrollMode && pdfDoc) {
+            statusText.innerText = `${e.data + 1} / ${pdfDoc.numPages}`;
+          }
+        });
+      } else {
+        // Re-calculate dimensions on mode toggle
+        setTimeout(() => {
+          pageFlip.update();
+        }, 50);
+      }
+    }
+
+    function updateViewMode() {
+      if (isScrollMode) {
+        flipContainer.classList.add('view-hidden');
+        scrollContainer.style.display = 'flex';
+        flipControls.style.display = 'none';
+        modeBtn.innerText = 'Mode: Scroll';
+        contentArea.style.transform = 'none';
+        applyZoom(1.0);
+        if (pdfDoc) statusText.innerText = `${pdfDoc.numPages} Pages`;
+      } else {
+        scrollContainer.style.display = 'none';
+        flipContainer.classList.remove('view-hidden');
+        flipControls.style.display = 'flex';
+        modeBtn.innerText = 'Mode: Book';
+        scrollContainer.style.maxWidth = '650px';
+        applyZoom(1.0);
+
+        initOrUpdateFlipBook();
+        if (pageFlip && pdfDoc) {
+          statusText.innerText = `${pageFlip.getCurrentPageIndex() + 1} / ${pdfDoc.numPages}`;
+        }
+      }
+    }
+
     pdfjsLib.getDocument(pdfUrl).promise.then(async (pdf) => {
+      pdfDoc = pdf;
       statusText.innerText = `Loading...`;
 
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 2.0 }); // 2x DPI for crisp text
+        const viewport = page.getViewport({ scale: 2.0 });
 
-        // Render for Scroll Mode
+        // Scroll mode canvas
         const sCanvas = document.createElement('canvas');
         sCanvas.width = viewport.width;
         sCanvas.height = viewport.height;
         await page.render({ canvasContext: sCanvas.getContext('2d'), viewport }).promise;
         scrollContainer.appendChild(sCanvas);
 
-        // Render for Flipbook Mode
+        // Flipbook mode canvas
         const pageDiv = document.createElement('div');
         pageDiv.className = 'page';
         const fCanvas = document.createElement('canvas');
@@ -209,58 +282,12 @@
       }
 
       statusText.innerText = '';
-
-      // Initialize Flipbook
-      const bookWidth = Math.min(window.innerWidth * 0.9, 440);
-      const bookHeight = bookWidth * 1.45;
-
-      pageFlip = new St.PageFlip(flipContainer, {
-        width: bookWidth,
-        height: bookHeight,
-        size: 'stretch',
-        minWidth: 260,
-        maxWidth: 500,
-        minHeight: 380,
-        maxHeight: 750,
-        showCover: true,
-        drawShadow: true,
-        mobileScrollSupport: true // Allows vertical scrolling through touches
-      });
-
-      pageFlip.loadFromHTML(document.querySelectorAll('.page'));
-
-      document.getElementById('prev-btn').onclick = () => pageFlip.flipPrev();
-      document.getElementById('next-btn').onclick = () => pageFlip.flipNext();
-
-      pageFlip.on('flip', (e) => {
-        statusText.innerText = `${e.data + 1} / ${pdf.numPages}`;
-      });
-
-      // Switch View Modes
-      function updateViewMode() {
-        if (isScrollMode) {
-          flipContainer.style.display = 'none';
-          scrollContainer.style.display = 'flex';
-          flipControls.style.display = 'none';
-          modeBtn.innerText = 'Mode: Scroll';
-          contentArea.style.transform = 'none';
-          applyZoom(1.0);
-        } else {
-          flipContainer.style.display = 'block';
-          scrollContainer.style.display = 'none';
-          flipControls.style.display = 'flex';
-          modeBtn.innerText = 'Mode: Book';
-          scrollContainer.style.maxWidth = '650px';
-          applyZoom(1.0);
-        }
-      }
+      updateViewMode();
 
       modeBtn.onclick = () => {
         isScrollMode = !isScrollMode;
         updateViewMode();
       };
-
-      updateViewMode();
 
     }).catch(err => {
       statusText.innerText = 'Error loading book.';
