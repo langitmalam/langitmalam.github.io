@@ -50,7 +50,7 @@
     .nav-btn:active { background: rgba(255, 255, 255, 0.25); }
     #status { font-size: 0.75rem; opacity: 0.7; }
 
-    /* Scrollable Container */
+    /* Scrollable Viewport */
     .viewport {
       position: fixed;
       top: 50px;
@@ -74,7 +74,7 @@
       transition: width 0.15s ease-out;
     }
 
-    /* Scroll Mode: Vertical Stack */
+    /* Scroll View */
     #scroll-view {
       display: flex;
       flex-direction: column;
@@ -90,14 +90,11 @@
       background-color: #fff;
     }
 
-    /* Flipbook Container */
-    #flipbook {
-      display: block;
-    }
+    /* Flipbook */
+    #flipbook { display: block; }
     .page { background-color: #fff; }
     .page canvas { width: 100% !important; height: 100% !important; display: block; }
 
-    /* Keeps flipbook in DOM with real dimensions instead of collapsing to 0x0 */
     .view-hidden {
       position: absolute !important;
       left: -9999px !important;
@@ -128,6 +125,40 @@
       font-size: 0.85rem;
       cursor: pointer;
     }
+
+    /* Bookmark Notification Banner */
+    #resume-banner {
+      position: fixed;
+      bottom: 68px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(26, 26, 26, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 0.8rem;
+      display: none;
+      gap: 12px;
+      align-items: center;
+      z-index: 2000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+    }
+    #resume-banner button {
+      background: #e0e0e0;
+      color: #0b0b0b;
+      border: none;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #resume-banner span.dismiss {
+      color: #777;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding-left: 4px;
+    }
   </style>
 </head>
 <body>
@@ -152,6 +183,13 @@
     </div>
   </div>
 
+  <!-- Bookmark Prompt Banner -->
+  <div id="resume-banner">
+    <span id="resume-text">Resume from page 1?</span>
+    <button id="resume-btn">Resume</button>
+    <span class="dismiss" id="dismiss-btn">✕</span>
+  </div>
+
   <div class="controls" id="flip-controls" style="display: none;">
     <button id="prev-btn">‹ Prev</button>
     <button id="next-btn">Next ›</button>
@@ -162,27 +200,36 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const pdfUrl = urlParams.get('file') || 'letters-i-never-sent.pdf';
+    const bookmarkKey = `langitmalam_bookmark_${pdfUrl}`;
 
     const statusText = document.getElementById('status');
-    const scrollContainer = document.getElementById('scroll-view');
+    const scrollContainer = document.getElementById('scroll-container');
+    const scrollView = document.getElementById('scroll-view');
     const flipContainer = document.getElementById('flipbook');
     const contentArea = document.getElementById('content-area');
     const zoomVal = document.getElementById('zoom-val');
     const modeBtn = document.getElementById('mode-btn');
     const flipControls = document.getElementById('flip-controls');
 
+    const resumeBanner = document.getElementById('resume-banner');
+    const resumeText = document.getElementById('resume-text');
+    const resumeBtn = document.getElementById('resume-btn');
+    const dismissBtn = document.getElementById('dismiss-btn');
+
     let pdfDoc = null;
     let currentZoom = 1.0;
     let isScrollMode = window.innerWidth <= 768;
     let pageFlip = null;
+    let activePageIndex = 0;
 
+    // Zoom Handling
     function applyZoom(val) {
       currentZoom = Math.min(Math.max(val, 0.8), 2.2);
       zoomVal.innerText = `${Math.round(currentZoom * 100)}%`;
 
       if (isScrollMode) {
         const baseWidth = Math.min(window.innerWidth * 0.94, 650);
-        scrollContainer.style.maxWidth = `${baseWidth * currentZoom}px`;
+        scrollView.style.maxWidth = `${baseWidth * currentZoom}px`;
       } else {
         contentArea.style.transform = `scale(${currentZoom})`;
         contentArea.style.transformOrigin = 'top center';
@@ -192,9 +239,15 @@
     document.getElementById('zoom-in').onclick = () => applyZoom(currentZoom + 0.2);
     document.getElementById('zoom-out').onclick = () => applyZoom(currentZoom - 0.2);
 
+    // Save Bookmark to Local Storage
+    function saveBookmark(pageIdx) {
+      activePageIndex = pageIdx;
+      localStorage.setItem(bookmarkKey, pageIdx);
+    }
+
+    // Flipbook Initialization
     function initOrUpdateFlipBook() {
       if (!pageFlip) {
-        // Build the flipbook for the first time while container has active dimensions
         const bookWidth = Math.min(window.innerWidth * 0.92, 440);
         const bookHeight = bookWidth * 1.45;
 
@@ -217,33 +270,34 @@
         document.getElementById('next-btn').onclick = () => pageFlip.flipNext();
 
         pageFlip.on('flip', (e) => {
+          saveBookmark(e.data);
           if (!isScrollMode && pdfDoc) {
             statusText.innerText = `${e.data + 1} / ${pdfDoc.numPages}`;
           }
         });
       } else {
-        // Re-calculate dimensions on mode toggle
         setTimeout(() => {
           pageFlip.update();
         }, 50);
       }
     }
 
+    // View Mode Switching
     function updateViewMode() {
       if (isScrollMode) {
         flipContainer.classList.add('view-hidden');
-        scrollContainer.style.display = 'flex';
+        scrollView.style.display = 'flex';
         flipControls.style.display = 'none';
         modeBtn.innerText = 'Mode: Scroll';
         contentArea.style.transform = 'none';
         applyZoom(1.0);
         if (pdfDoc) statusText.innerText = `${pdfDoc.numPages} Pages`;
       } else {
-        scrollContainer.style.display = 'none';
+        scrollView.style.display = 'none';
         flipContainer.classList.remove('view-hidden');
         flipControls.style.display = 'flex';
         modeBtn.innerText = 'Mode: Book';
-        scrollContainer.style.maxWidth = '650px';
+        scrollView.style.maxWidth = '650px';
         applyZoom(1.0);
 
         initOrUpdateFlipBook();
@@ -253,6 +307,57 @@
       }
     }
 
+    // Track scroll position to auto-save in Scroll Mode
+    scrollContainer.addEventListener('scroll', () => {
+      if (!isScrollMode || !pdfDoc) return;
+      const canvases = scrollView.querySelectorAll('canvas');
+      const containerTop = scrollContainer.getBoundingClientRect().top;
+
+      canvases.forEach((canvas, idx) => {
+        const rect = canvas.getBoundingClientRect();
+        if (rect.top <= containerTop + 150 && rect.bottom >= containerTop) {
+          saveBookmark(idx);
+          statusText.innerText = `Page ${idx + 1} / ${pdfDoc.numPages}`;
+        }
+      });
+    });
+
+    // Jump to specific page
+    function jumpToPage(targetIndex) {
+      if (isScrollMode) {
+        const canvases = scrollView.querySelectorAll('canvas');
+        if (canvases[targetIndex]) {
+          canvases[targetIndex].scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        initOrUpdateFlipBook();
+        if (pageFlip) {
+          pageFlip.turnToPage(targetIndex);
+        }
+      }
+    }
+
+    // Check Saved Progress on Load
+    function checkSavedProgress() {
+      const savedPage = localStorage.getItem(bookmarkKey);
+      if (savedPage !== null) {
+        const pageIdx = parseInt(savedPage, 10);
+        if (!isNaN(pageIdx) && pageIdx > 0 && pageIdx < pdfDoc.numPages) {
+          resumeText.innerText = `Resume from page ${pageIdx + 1}?`;
+          resumeBanner.style.display = 'flex';
+
+          resumeBtn.onclick = () => {
+            jumpToPage(pageIdx);
+            resumeBanner.style.display = 'none';
+          };
+          dismissBtn.onclick = () => {
+            resumeBanner.style.display = 'none';
+          };
+        }
+      }
+    }
+
+    // Load PDF
     pdfjsLib.getDocument(pdfUrl).promise.then(async (pdf) => {
       pdfDoc = pdf;
       statusText.innerText = `Loading...`;
@@ -261,14 +366,14 @@
         const page = await pdf.getPage(i);
         const viewport = page.getViewport({ scale: 2.0 });
 
-        // Scroll mode canvas
+        // Canvas for Scroll mode
         const sCanvas = document.createElement('canvas');
         sCanvas.width = viewport.width;
         sCanvas.height = viewport.height;
         await page.render({ canvasContext: sCanvas.getContext('2d'), viewport }).promise;
-        scrollContainer.appendChild(sCanvas);
+        scrollView.appendChild(sCanvas);
 
-        // Flipbook mode canvas
+        // Canvas for Flipbook mode
         const pageDiv = document.createElement('div');
         pageDiv.className = 'page';
         const fCanvas = document.createElement('canvas');
@@ -283,6 +388,7 @@
 
       statusText.innerText = '';
       updateViewMode();
+      checkSavedProgress();
 
       modeBtn.onclick = () => {
         isScrollMode = !isScrollMode;
