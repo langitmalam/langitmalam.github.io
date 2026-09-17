@@ -8,94 +8,114 @@
   <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
       background-color: #0b0b0b;
       color: #e0e0e0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      overflow: hidden;
     }
+
+    /* Fixed Top Navigation */
     .nav-bar {
       position: fixed;
       top: 0; left: 0; right: 0;
-      height: 52px;
-      padding: 0 16px;
+      height: 50px;
+      padding: 0 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(11, 11, 11, 0.96);
+      background: rgba(11, 11, 11, 0.98);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       z-index: 1000;
     }
-    .nav-left, .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-left, .nav-right { display: flex; align-items: center; gap: 8px; }
     .nav-bar a {
       color: #aaa;
       text-decoration: none;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
-    .nav-bar a:hover { color: #fff; }
     .nav-btn {
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       color: #e0e0e0;
       padding: 5px 10px;
       font-size: 0.75rem;
       cursor: pointer;
       border-radius: 3px;
     }
-    .nav-btn:hover { background: rgba(255, 255, 255, 0.2); }
+    .nav-btn:active { background: rgba(255, 255, 255, 0.25); }
     #status { font-size: 0.75rem; opacity: 0.7; }
 
-    /* Viewer Area */
+    /* Scrollable Container (Fixed Viewport) */
     .viewport {
-      margin-top: 60px;
-      margin-bottom: 70px;
-      width: 100vw;
+      position: fixed;
+      top: 50px;
+      bottom: 56px;
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x pan-y;
+      padding: 16px 10px;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      overflow: auto;
-      padding: 10px;
-    }
-    .zoom-wrapper {
-      transform-origin: top center;
-      transition: transform 0.15s ease-out;
     }
 
-    /* Flipbook view */
-    #flipbook { display: block; margin: 0 auto; }
+    .content-wrapper {
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: width 0.15s ease-out;
+    }
+
+    /* Scroll Mode: Pages stack vertically with natural scrolling */
+    #scroll-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      max-width: 650px;
+    }
+    #scroll-view canvas {
+      width: 100% !important;
+      height: auto !important;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+      background-color: #fff;
+    }
+
+    /* Book Flip Mode */
+    #flipbook { display: none; }
     .page { background-color: #fff; }
     .page canvas { width: 100% !important; height: 100% !important; display: block; }
 
-    /* Scroll view (continuous reading) */
-    #scroll-view { display: none; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 720px; }
-    #scroll-view canvas { width: 100% !important; height: auto !important; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
-
-    /* Bottom Controls */
+    /* Bottom Navigation Bar */
     .controls {
       position: fixed;
-      bottom: 16px;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
-      gap: 10px;
+      gap: 12px;
       z-index: 1000;
-      background: rgba(11, 11, 11, 0.85);
-      padding: 6px 14px;
+      background: rgba(18, 18, 18, 0.9);
+      padding: 6px 16px;
       border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
     }
     .controls button {
       background: none;
       border: none;
       color: #e0e0e0;
       font-size: 0.85rem;
-      padding: 4px 10px;
       cursor: pointer;
     }
-    .controls button:hover { color: #fff; }
   </style>
 </head>
 <body>
@@ -103,7 +123,7 @@
   <div class="nav-bar">
     <div class="nav-left">
       <a href="index.html">← Back</a>
-      <button class="nav-btn" id="mode-btn">Mode: Book</button>
+      <button class="nav-btn" id="mode-btn">Mode: Scroll</button>
     </div>
     <span id="status">Loading...</span>
     <div class="nav-right">
@@ -113,14 +133,14 @@
     </div>
   </div>
 
-  <div class="viewport">
-    <div class="zoom-wrapper" id="zoom-target">
-      <div id="flipbook"></div>
+  <div class="viewport" id="scroll-container">
+    <div class="content-wrapper" id="content-area">
       <div id="scroll-view"></div>
+      <div id="flipbook"></div>
     </div>
   </div>
 
-  <div class="controls" id="flip-controls">
+  <div class="controls" id="flip-controls" style="display: none;">
     <button id="prev-btn">‹ Prev</button>
     <button id="next-btn">Next ›</button>
   </div>
@@ -132,98 +152,115 @@
     const pdfUrl = urlParams.get('file') || 'letters-i-never-sent.pdf';
 
     const statusText = document.getElementById('status');
-    const flipContainer = document.getElementById('flipbook');
     const scrollContainer = document.getElementById('scroll-view');
-    const zoomTarget = document.getElementById('zoom-target');
+    const flipContainer = document.getElementById('flipbook');
+    const contentArea = document.getElementById('content-area');
     const zoomVal = document.getElementById('zoom-val');
+    const modeBtn = document.getElementById('mode-btn');
+    const flipControls = document.getElementById('flip-controls');
 
     let currentZoom = 1.0;
-    let isScrollMode = false;
+    // Default mobile phones to scroll mode automatically
+    let isScrollMode = window.innerWidth <= 768;
     let pageFlip = null;
 
-    // Zoom Controls
-    function setZoom(val) {
-      currentZoom = Math.min(Math.max(val, 0.8), 2.5);
-      zoomTarget.style.transform = `scale(${currentZoom})`;
+    function applyZoom(val) {
+      currentZoom = Math.min(Math.max(val, 0.8), 2.2);
       zoomVal.innerText = `${Math.round(currentZoom * 100)}%`;
+
+      if (isScrollMode) {
+        // Expand real DOM dimensions so native vertical scrolling works effortlessly
+        const baseWidth = Math.min(window.innerWidth * 0.94, 650);
+        scrollContainer.style.maxWidth = `${baseWidth * currentZoom}px`;
+      } else {
+        contentArea.style.transform = `scale(${currentZoom})`;
+        contentArea.style.transformOrigin = 'top center';
+      }
     }
-    document.getElementById('zoom-in').onclick = () => setZoom(currentZoom + 0.2);
-    document.getElementById('zoom-out').onclick = () => setZoom(currentZoom - 0.2);
+
+    document.getElementById('zoom-in').onclick = () => applyZoom(currentZoom + 0.2);
+    document.getElementById('zoom-out').onclick = () => applyZoom(currentZoom - 0.2);
 
     pdfjsLib.getDocument(pdfUrl).promise.then(async (pdf) => {
-      statusText.innerText = `Loading 1/${pdf.numPages}...`;
+      statusText.innerText = `Loading...`;
 
-      // Render high-resolution canvases (2x for crisp text)
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 2.0 });
+        const viewport = page.getViewport({ scale: 2.0 }); // 2x DPI for crisp text
 
-        // 1. Setup Canvas for Flipbook
-        const flipPageDiv = document.createElement('div');
-        flipPageDiv.className = 'page';
-        const flipCanvas = document.createElement('canvas');
-        flipCanvas.width = viewport.width;
-        flipCanvas.height = viewport.height;
-        await page.render({ canvasContext: flipCanvas.getContext('2d'), viewport }).promise;
-        flipPageDiv.appendChild(flipCanvas);
-        flipContainer.appendChild(flipPageDiv);
+        // Render for Scroll Mode
+        const sCanvas = document.createElement('canvas');
+        sCanvas.width = viewport.width;
+        sCanvas.height = viewport.height;
+        await page.render({ canvasContext: sCanvas.getContext('2d'), viewport }).promise;
+        scrollContainer.appendChild(sCanvas);
 
-        // 2. Clone Canvas for Scroll Mode
-        const scrollCanvas = document.createElement('canvas');
-        scrollCanvas.width = viewport.width;
-        scrollCanvas.height = viewport.height;
-        await page.render({ canvasContext: scrollCanvas.getContext('2d'), viewport }).promise;
-        scrollContainer.appendChild(scrollCanvas);
+        // Render for Flipbook Mode
+        const pageDiv = document.createElement('div');
+        pageDiv.className = 'page';
+        const fCanvas = document.createElement('canvas');
+        fCanvas.width = viewport.width;
+        fCanvas.height = viewport.height;
+        await page.render({ canvasContext: fCanvas.getContext('2d'), viewport }).promise;
+        pageDiv.appendChild(fCanvas);
+        flipContainer.appendChild(pageDiv);
 
         statusText.innerText = `${i}/${pdf.numPages}`;
       }
 
       statusText.innerText = '';
 
-      // Initialize responsive Flipbook
-      const bookWidth = Math.min(window.innerWidth * 0.9, 480);
+      // Initialize Flipbook
+      const bookWidth = Math.min(window.innerWidth * 0.9, 440);
       const bookHeight = bookWidth * 1.45;
 
       pageFlip = new St.PageFlip(flipContainer, {
         width: bookWidth,
         height: bookHeight,
         size: 'stretch',
-        minWidth: 280,
-        maxWidth: 600,
-        minHeight: 400,
-        maxHeight: 900,
+        minWidth: 260,
+        maxWidth: 500,
+        minHeight: 380,
+        maxHeight: 750,
         showCover: true,
         drawShadow: true,
-        mobileScrollSupport: false
+        mobileScrollSupport: true // Allows vertical scrolling through touches
       });
 
       pageFlip.loadFromHTML(document.querySelectorAll('.page'));
 
       document.getElementById('prev-btn').onclick = () => pageFlip.flipPrev();
       document.getElementById('next-btn').onclick = () => pageFlip.flipNext();
+
       pageFlip.on('flip', (e) => {
         statusText.innerText = `${e.data + 1} / ${pdf.numPages}`;
       });
 
-      // View Mode Toggle (Flip vs Scroll)
-      const modeBtn = document.getElementById('mode-btn');
-      const flipControls = document.getElementById('flip-controls');
-
-      modeBtn.onclick = () => {
-        isScrollMode = !isScrollMode;
+      // Switch View Modes
+      function updateViewMode() {
         if (isScrollMode) {
           flipContainer.style.display = 'none';
           scrollContainer.style.display = 'flex';
           flipControls.style.display = 'none';
           modeBtn.innerText = 'Mode: Scroll';
+          contentArea.style.transform = 'none';
+          applyZoom(1.0);
         } else {
           flipContainer.style.display = 'block';
           scrollContainer.style.display = 'none';
           flipControls.style.display = 'flex';
           modeBtn.innerText = 'Mode: Book';
-          setZoom(1.0);
+          scrollContainer.style.maxWidth = '650px';
+          applyZoom(1.0);
         }
+      }
+
+      modeBtn.onclick = () => {
+        isScrollMode = !isScrollMode;
+        updateViewMode();
       };
+
+      updateViewMode();
 
     }).catch(err => {
       statusText.innerText = 'Error loading book.';
