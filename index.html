@@ -15,6 +15,13 @@
 <meta property="og:url" content="https://langitmalam.github.io/">
 <meta name="twitter:card" content="summary_large_image">
 
+<!-- Web App Manifest & Mobile App Support -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1b252b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 <style>
 
 /* =========================
@@ -985,6 +992,14 @@ document.querySelectorAll(".library-carousel").forEach(carousel => {
             changeBook(lang, -1); // Swipe Right -> Prev
         }
     }, { passive: true });
+});
+
+// Desktop keyboard arrow navigation
+document.addEventListener("keydown", (e) => {
+    const isMalay = document.getElementById("malay-books").style.display !== "none";
+    const lang = isMalay ? "malay" : "english";
+    if (e.key === "ArrowRight") changeBook(lang, 1);
+    if (e.key === "ArrowLeft") changeBook(lang, -1);
 });
 
 document.addEventListener("DOMContentLoaded", function() {
