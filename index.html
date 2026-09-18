@@ -6,6 +6,15 @@
 
 <title>LANGIT MALAM</title>
 
+<!-- Favicon & Social Previews -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%2326333a%22>✦</text></svg>">
+<meta name="description" content="A collection of stories, letters, and thoughts that were never meant to be spoken.">
+<meta property="og:title" content="LANGITMALAM — Digital Library">
+<meta property="og:description" content="Stories that were never meant to be spoken. Read online or download complete manuscripts.">
+<meta property="og:image" content="https://langitmalam.github.io/cover.png">
+<meta property="og:url" content="https://langitmalam.github.io/">
+<meta name="twitter:card" content="summary_large_image">
+
 <style>
 
 /* =========================
@@ -206,6 +215,7 @@ section > h2 {
     max-width: 900px;
     margin: 0 auto;
     padding: 0 55px 30px;
+    touch-action: pan-y;
 }
 
 
@@ -893,6 +903,9 @@ function showLanguage(language) {
 
     if (!englishBooks || !malayBooks) return;
 
+    // Save language selection to browser memory
+    localStorage.setItem("langitmalam_lang", language);
+
     if (language === "english") {
         englishBooks.style.display = "block";
         malayBooks.style.display = "none";
@@ -952,8 +965,32 @@ function changeBook(language, direction) {
     }
 }
 
+// Touch swipe support for mobile carousels
+document.querySelectorAll(".library-carousel").forEach(carousel => {
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    carousel.addEventListener("touchstart", e => {
+        touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    carousel.addEventListener("touchend", e => {
+        touchEndX = e.changedTouches[0].screenX;
+        const lang = carousel.id.startsWith("english") ? "english" : "malay";
+        const swipeDistance = touchStartX - touchEndX;
+
+        if (swipeDistance > 45) {
+            changeBook(lang, 1);  // Swipe Left -> Next
+        } else if (swipeDistance < -45) {
+            changeBook(lang, -1); // Swipe Right -> Prev
+        }
+    }, { passive: true });
+});
+
 document.addEventListener("DOMContentLoaded", function() {
-    showLanguage("english");
+    // Restore reader's last viewed language or default to English
+    const savedLang = localStorage.getItem("langitmalam_lang") || "english";
+    showLanguage(savedLang);
 });
 </script>
 
